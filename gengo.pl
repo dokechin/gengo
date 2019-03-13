@@ -29,7 +29,7 @@ for my $letter(keys %ucs){
     my $url = sprintf 'https://mojikiban.ipa.go.jp/mji/q?UCS=0x%X', $ucs{$letter};
     my $res = $ua->get($url);
     my $data = decode_json $res->content;
-    push @mojis, {letter => $letter, kaku => $data->{"results"}[0]->{"総画数"}}; 
+    push @mojis, {letter => $letter, kaku => $data->{"results"}[0]->{"総画数"}, yomi => $data->{"results"}[0]->{"読み"}->{"音読み"}[0]}; 
 }
 
 #２文字取り出す
@@ -38,11 +38,13 @@ my $p = Algorithm::Permute->new([0 .. scalar(@mojis)-1], 2);
 while (my @res = $p->next) {
     my $total = 0;
     my $g = "";
+    my $yomi = "";
     for my $i (@res){
         $total += $mojis[$i]->{"kaku"};
         $g .= $mojis[$i]->{"letter"};
+        $yomi .= $mojis[$i]->{"yomi"};
     }
-    if ($total < 20 && !exists($era_hash{$g})){
-        print encode_utf8($g), $total,"\n";
+    if ($total < 20 && !exists($era_hash{$g}) && $yomi !~ /^[ハマミムメモタチツテトサシスセソハヒフヘホ]/){
+        printf "%s,%s,%d\n", encode_utf8($g), encode_utf8($yomi), $total;
     }
 }
