@@ -4,3 +4,4 @@ requires 'Furl';
 requires 'JSON::XS';
 requires 'IO::Socket::SSL';
 requires 'Algorithm::Permute';
+requires 'Text::MeCab';

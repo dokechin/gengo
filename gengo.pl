@@ -6,6 +6,7 @@ use Furl;
 use utf8;
 use JSON::XS qw/decode_json/;
 use Algorithm::Permute;
+use Text::MeCab;
 
 my @eras = DateTime::Calendar::Japanese::Era->registered();
 
@@ -35,6 +36,8 @@ for my $letter(keys %ucs){
 #２文字取り出す
 my $p = Algorithm::Permute->new([0 .. scalar(@mojis)-1], 2);
  
+my $m = Text::MeCab->new();
+
 while (my @res = $p->next) {
     my $total = 0;
     my $g = "";
@@ -44,7 +47,17 @@ while (my @res = $p->next) {
         $g .= $mojis[$i]->{"letter"};
         $yomi .= $mojis[$i]->{"yomi"};
     }
-    if ($total < 20 && !exists($era_hash{$g}) && $yomi !~ /^[ハマミムメモタチツテトサシスセソハヒフヘホ]/){
+    my $n = $m->parse($yomi);
+    my $feature1 = Encode::decode('utf-8', $n->feature);
+    my @feature1 = split ',' , $feature1;
+
+    $n = $n->next;
+    my $feature2 = Encode::decode('utf-8', $n->feature);
+    my @feature2 = split ',' , $feature2;
+
+    my $general = ($feature1[1] eq "一般" && $feature2[0] eq "BOS/EOS")? 1:0;
+
+    if ($total < 20 && !exists($era_hash{$g}) && $yomi !~ /^[ハマミムメモタチツテトサシスセソハヒフヘホ]/ && !$general){
         printf "%s,%s,%d\n", encode_utf8($g), encode_utf8($yomi), $total;
     }
 }
