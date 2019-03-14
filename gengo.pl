@@ -36,8 +36,6 @@ for my $letter(keys %ucs){
 #２文字取り出す
 my $p = Algorithm::Permute->new([0 .. scalar(@mojis)-1], 2);
  
-my $m = Text::MeCab->new();
-
 while (my @res = $p->next) {
     my $total = 0;
     my $g = "";
@@ -47,7 +45,9 @@ while (my @res = $p->next) {
         $g .= $mojis[$i]->{"letter"};
         $yomi .= $mojis[$i]->{"yomi"};
     }
-    my $n = $m->parse($yomi);
+    
+    my $m = Text::MeCab->new();
+    my $n = $m->parse($g);
     my $feature1 = Encode::decode('utf-8', $n->feature);
     my @feature1 = split ',' , $feature1;
 
@@ -55,9 +55,9 @@ while (my @res = $p->next) {
     my $feature2 = Encode::decode('utf-8', $n->feature);
     my @feature2 = split ',' , $feature2;
 
-    my $general = ($feature1[1] eq "一般" && $feature2[0] eq "BOS/EOS")? 1:0;
+    my $general = (($feature1[1] eq "一般") && ($feature2[0] eq "BOS/EOS"))? 1:0;
 
-    if ($total < 20 && !exists($era_hash{$g}) && $yomi !~ /^[ハマミムメモタチツテトサシスセソハヒフヘホ]/ && !$general){
+    if ($total < 20 && !exists($era_hash{$g}) && $yomi !~ /^[ハマミムメモタチツテトサシスセソハヒフヘホ]/ && $general == 0){
         printf "%s,%s,%d\n", encode_utf8($g), encode_utf8($yomi), $total;
     }
 }
