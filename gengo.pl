@@ -48,14 +48,14 @@ while (my @res = $p->next) {
     
     my $m = Text::MeCab->new();
     my $n = $m->parse($g);
-    my $feature1 = Encode::decode('utf-8', $n->feature);
-    my @feature1 = split ',' , $feature1;
+    my $f1 = Encode::decode('utf-8', $n->feature);
+    my @f1 = split ',' , $f1;
 
     $n = $n->next;
-    my $feature2 = Encode::decode('utf-8', $n->feature);
-    my @feature2 = split ',' , $feature2;
+    my $f2 = Encode::decode('utf-8', $n->feature);
+    my @f2 = split ',' , $f2;
 
-    my $general = (($feature1[1] eq "一般") && ($feature2[0] eq "BOS/EOS"))? 1:0;
+    my $general = (($f1[1] eq "一般" || $f1[1] eq "サ変接続" || $f1[1] eq "形容動詞語幹") && ($f2[0] eq "BOS/EOS"))? 1:0;
 
     if ($total < 20 && !exists($era_hash{$g}) && $yomi !~ /^[ハマミムメモタチツテトサシスセソハヒフヘホ]/ && $general == 0){
         printf "%s,%s,%d\n", encode_utf8($g), encode_utf8($yomi), $total;
