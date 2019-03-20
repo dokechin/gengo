@@ -57,7 +57,7 @@ while (my @res = $p->next) {
 
     my $general = (($f1[1] eq "一般" || $f1[1] eq "サ変接続" || $f1[1] eq "形容動詞語幹") && ($f2[0] eq "BOS/EOS"))? 1:0;
 
-    if ($total < 20 && !exists($era_hash{$g}) && $yomi !~ /^[ハマミムメモタチツテトサシスセソハヒフヘホ]/ && $general == 0){
+    if ($total < 20 && !exists($era_hash{$g}) && $yomi !~ /^[ハマミムメモタツテトサシスセソハヒフヘホ]/ && $general == 0){
         printf "%s,%s,%d\n", encode_utf8($g), encode_utf8($yomi), $total;
     }
 }
